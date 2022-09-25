@@ -1,6 +1,7 @@
 <template>
   <div class="usermain">
     用户页
+    <a href="#" @click.prevent="outlogin">退出登录</a>
   </div>
 </template>
 
@@ -17,6 +18,13 @@ export default {
         this.$router.replace("/login");
       }
     },
+    async outlogin(){
+      const r = await this.$api.outloginAPI()
+      if (r.data.code == "200") {
+        this.$router.replace("/login");
+        window.location.reload()
+      }
+    }
   },
 };
 </script>

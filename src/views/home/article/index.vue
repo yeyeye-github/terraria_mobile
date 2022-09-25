@@ -89,6 +89,7 @@ export default {
     img {
       width: 33%;
       object-fit: contain;
+      height: 75px;
       background-color: rgb(163, 174, 177);
     }
   }

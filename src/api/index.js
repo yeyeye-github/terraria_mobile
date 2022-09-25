@@ -36,3 +36,24 @@ export function articleAPI(id,page){
         }
     })
 }
+
+export function allChannelAPI(){
+    return axios({
+        url:"/api/allchannel",
+        method:'get',
+    })
+}
+
+export function userchannelAPI(){
+    return axios({
+        url:"/api/userchannel",
+        method:'get',
+    })
+}
+
+export function outloginAPI(){
+    return axios({
+        url:"/api/outlogin",
+        method:'get',
+    })
+}

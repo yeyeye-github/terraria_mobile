@@ -17,6 +17,9 @@ Vue.component("myfooter", myfooter)
 Vue.prototype.$api = api
 
 new Vue({
+  beforeCreate(){
+    Vue.prototype.$bus = this
+  },
   router,
   store,
   render: h => h(App)

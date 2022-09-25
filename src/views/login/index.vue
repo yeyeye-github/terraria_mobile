@@ -31,7 +31,8 @@ export default {
         const r = await this.$api.loginAPI(this.phone, this.password)
         console.log(r.data)
         if(r.data.code == 200){
-          this.$router.replace('/home')
+          this.$router.replace('/user')
+          window.location.reload()
         }
         else{
           alert(r.data.msg)
