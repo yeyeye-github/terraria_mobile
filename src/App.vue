@@ -1,32 +1,41 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+  <div class="all">
+    <div class="main">
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
+    </div>
+    <myfooter></myfooter>
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+export default {
+  data() {
+    return {
+    };
+  },
+  mounted() {
+  },
+};
+</script>
 
-nav {
-  padding: 30px;
+<style scoped lang="less">
+body{
+  overflow: hidden;
 }
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
+html{
+  overflow: hidden;
 }
-
-nav a.router-link-exact-active {
-  color: #42b983;
+.main {
+  // height: 100vh;
+  margin-top: 87px;
+  margin-bottom: 45px;
+  // height: calc(100% - 65px);
+}
+.all{
+  height: 100vh;
+  overflow: hidden;
 }
 </style>
