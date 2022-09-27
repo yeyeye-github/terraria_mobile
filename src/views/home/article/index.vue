@@ -12,7 +12,7 @@
       <span>{{name}}&nbsp;&nbsp;&nbsp;</span>
       <span>{{num}} 评论&nbsp;&nbsp;&nbsp;</span>
       <span>{{showtime}}前&nbsp;&nbsp;&nbsp;</span>
-      <span class="fr">×</span>
+      <span @click="fankui" class="fr">×</span>
     </div>
   </div>
 </template>
@@ -22,9 +22,10 @@ export default {
   data() {
     return {
       showtime: "",
+      showPanel:false,
     };
   },
-  props: ["title", "num", "time", "name", "type", "imglist"],
+  props: ["title", "num", "time", "name", "type", "imglist","id"],
   watch: {
     time: {
       immediate: true,
@@ -34,6 +35,9 @@ export default {
     },
   },
   methods: {
+    fankui(){
+      this.$bus.$emit('fankui',this.id)
+    },
     timeT(str) {
       const jiange = new Date(new Date() - new Date(this.time));
       var days = Math.floor(jiange / (24 * 3600 * 1000));

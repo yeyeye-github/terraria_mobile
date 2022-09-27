@@ -12,7 +12,7 @@
       <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
     <!-- <div class="test"><button @click="ttt">点击</button></div> -->
-    <myfooter></myfooter>
+    <myfooter v-if="!$route.meta.footer"></myfooter>
   </div>
 </template>
 

@@ -57,3 +57,13 @@ export function outloginAPI(){
         method:'get',
     })
 }
+
+export function changeChannelAPI(channel){
+    return axios({
+        url:"/api/changeChannel",
+        method:'post',
+        data:{
+            channel:channel
+        }
+    })
+}

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import login from '@/views/login'
 import user from '@/views/user'
 import home from '@/views/home'
+import search from '@/views/search'
 
 
 const originalPush = VueRouter.prototype.push
@@ -26,7 +27,12 @@ const routes = [
   {
     path: '/home',
     component: home,
-    meta: { home: true,keepAlive:true }
+    meta: { home: true,keepAlive:true },
+  },
+  {
+    path:'/search',
+    component:search,
+    meta:{footer:true },
   },
   {
     path: '/login',

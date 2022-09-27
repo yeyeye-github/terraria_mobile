@@ -4,7 +4,7 @@
       <img class="fimg" src="@/assets/images/home/1.webp" alt="">
       <span>头条号</span>
       <div style="flex:1"></div>
-      <i class="iconfont icon-search"></i>
+      <i @click="search" class="iconfont icon-search"></i>
     </div>
     <div>
       <div class="channel" style="left: 0;right:0" ref="ch">
@@ -27,7 +27,7 @@
           点击添加更多频道：
         </div>
         <div class="allChannel">
-          <span @click="addc(d.name)"  v-for="(d) in otherChannelList" :key="d.idd">
+          <span @click="addc(d.name)" v-for="(d) in otherChannelList" :key="d.idd">
             {{d.name}}
             <span v-show="bbj == '完成'" class="ca">✓</span>
           </span>
@@ -35,16 +35,23 @@
       </div>
     </div>
     <div ref="loadtip" class="myreload" style="top: 55px;">{{tips.t[tips.curr]}}</div>
-    <div ref="panel" v-for="(d) in allArticle" @touchstart="touchs($event)" @touchmove="touchm($event)" @touchend="touche($event)" :key="d.id" class="main" :style="{height: `${h}`}" @scroll="getScroll"
-      :class="{no:d.id != channelCurr}">
+    <div ref="panel" v-for="(d) in allArticle" @touchstart="touchs($event)" @touchmove="touchm($event)" @touchend="touche($event)" :key="d.idd" class="main" :style="{height: `${h}`}" @scroll="getScroll"
+      :class="{no:d.idd != channelCurr}">
       <div class="article">
-        <myarticle v-for="(c) in d.data" :key='c.id' :title="c.title" :num="c.content_num" :time="c.time" :name="c.username" :type="c.type" :imglist="c.imgurl.split(',')"></myarticle>
+        <transition-group :name="groupname">
+          <myarticle v-for="(c) in d.data" :key='c.id' :id="c.id" :title="c.title" :num="c.content_num" :time="c.time" :name="c.username" :type="c.type" :imglist="c.imgurl.split(',')"></myarticle>
+        </transition-group>
       </div>
       <div class="jiazaiz">
         {{d.zz}}
       </div>
     </div>
-
+    <transition name="fankuit">
+      <div @click="quxiao($event)" v-show="fankuishow" class="fankuipanel">
+        <span @click="nointerest">不感兴趣（数据库并没有删除）</span>
+        <span @click="fankuishow = false">取消</span>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -73,6 +80,9 @@ export default {
       bigtipShow: false,
       ts: "",
       bbj: "编辑",
+      fankuishow: false,
+      delID: -1,
+      groupname: "no",
     };
   },
   components: {
@@ -81,34 +91,71 @@ export default {
   mounted() {
     this.h = document.documentElement.clientHeight - 132 + "px";
     this.getChannel();
+    this.$bus.$on("fankui", this.fankuimianban);
   },
   methods: {
-    addc(name){
+    search() {
+      this.$router.push('/search')
+    },
+    async nointerest() {
+      const r = await this.$api.autoLoginAPI();
+      if (r.data.code == 201) {
+        const tem = {};
+        tem.show = true;
+        tem.ts = "请先登录！";
+        tem.time = 1000;
+        tem.fun = function (a) {
+          a.$router.push("/login");
+        };
+        this.$bus.$emit("ttss", tem);
+        return;
+      }
+      this.groupname = "del";
+      setTimeout(() => {
+        this.groupname = "no";
+      }, 300);
+      this.allArticle[this.channelCurr].data = this.allArticle[
+        this.channelCurr
+      ].data.filter((e) => {
+        return e.id != this.delID;
+      });
+      this.fankuishow = false;
+    },
+    quxiao(e) {
+      if (e.target.className == "fankuipanel") {
+        this.fankuishow = false;
+      }
+    },
+    fankuimianban(id) {
+      this.delID = id;
+      this.fankuishow = true;
+    },
+    addc(name) {
       if (this.bbj == "完成") {
         this.otherChannelList = this.otherChannelList.filter((e) => {
-          if (e.name != name){
-            return true
-          }else{
-            this.channelList.push(e)
-            return false
+          if (e.name != name) {
+            return true;
+          } else {
+            this.channelList.push(e);
+            return false;
           }
         });
       }
     },
     removec(name) {
-      if(name == "推荐"){
-        return
+      if (name == "推荐") {
+        return;
       }
       if (this.bbj == "完成") {
         this.channelList = this.channelList.filter((e) => {
-          if (e.name != name){
-            return true
-          }else{
-            this.otherChannelList.push(e)
-            if(e.idd == this.channelCurr){
-              this.channelCurr = 1
+          if (e.name != name) {
+            return true;
+          } else {
+            this.otherChannelList.push(e);
+            if (e.idd == this.channelCurr) {
+              this.channelCurr = 1;
             }
-            return false
+            return false;
           }
         });
       }
@@ -129,6 +176,7 @@ export default {
         }
         this.bbj = "完成";
       } else {
+        this.$api.changeChannelAPI(this.channelList);
         this.bbj = "编辑";
       }
     },
@@ -177,7 +225,7 @@ export default {
         tem.isDown = false;
         tem.isLoad = false;
         tem.zz = "加载中";
-        tem.id = this.channelCurr;
+        tem.idd = this.channelCurr;
         tem.data = [];
         // this.allArticle[e.id] = tem;
         this.$set(this.allArticle, `${this.channelCurr}`, tem);
@@ -224,10 +272,10 @@ export default {
           tem.isDown = false;
           tem.isLoad = false;
           tem.zz = "加载中";
-          tem.id = e.id;
+          tem.idd = e.idd;
           tem.data = [];
           // this.allArticle[e.id] = tem;
-          this.$set(this.allArticle, `${e.id}`, tem);
+          this.$set(this.allArticle, `${e.idd}`, tem);
           // this.$set(this.allArticle[e.id],"data",[])
           // this.$set(this.allArticle[e.id],"page",0)
           // this.$set(this.allArticle[e.id],"isDown",false)
@@ -244,10 +292,10 @@ export default {
           tem.isDown = false;
           tem.isLoad = false;
           tem.zz = "加载中";
-          tem.id = e.id;
+          tem.idd = e.idd;
           tem.data = [];
           // this.allArticle[e.id] = tem;
-          this.$set(this.allArticle, `${e.id}`, tem);
+          this.$set(this.allArticle, `${e.idd}`, tem);
           // this.$set(this.allArticle[e.id],"data",[])
           // this.$set(this.allArticle[e.id],"page",0)
           // this.$set(this.allArticle[e.id],"isDown",false)
@@ -272,6 +320,18 @@ export default {
           e.target.offsetWidth / 2,
         behavior: "smooth",
       });
+
+      // console.log(this.channelCurr)
+      if (!this.allArticle[this.channelCurr]) {
+        const tem = {};
+        tem.page = 0;
+        tem.isDown = false;
+        tem.isLoad = false;
+        tem.zz = "加载中";
+        tem.idd = id;
+        tem.data = [];
+        this.$set(this.allArticle, `${tem.idd}`, tem);
+      }
 
       if (this.allArticle[this.channelCurr].page == 0) {
         this.getArticle();
@@ -331,6 +391,45 @@ export default {
 </script>
 
 <style scoped lang="less">
+.del-leave-active {
+  transition: left 0.3s ease;
+  position: relative;
+  left: 0px;
+}
+
+.del-leave-to {
+  left: -100%;
+}
+
+.fankuit-enter-active,
+.fankuit-leave-active {
+  transition: all 0.3s ease;
+}
+.fankuit-enter,
+.fankuit-leave-to {
+  opacity: 0;
+}
+
+.fankuipanel {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 7;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  span {
+    text-align: center;
+    height: 50px;
+    background-color: white;
+    line-height: 50px;
+    &:first-of-type {
+      border-radius: 15px 15px 0 0;
+    }
+  }
+}
 .headerr {
   position: fixed;
   z-index: 5;
@@ -467,7 +566,7 @@ export default {
         line-height: normal;
         color: rgb(226, 150, 150);
       }
-      .ca{
+      .ca {
         height: 10px;
         position: absolute;
         right: 2px;
