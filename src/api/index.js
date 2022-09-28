@@ -67,3 +67,13 @@ export function changeChannelAPI(channel){
         }
     })
 }
+
+export function searchwordAPI(word){
+    return axios({
+        url:"/api/searchword",
+        method:'get',
+        params:{
+            word:word
+        }
+    })
+}
