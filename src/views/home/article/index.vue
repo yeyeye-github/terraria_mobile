@@ -1,5 +1,5 @@
 <template>
-  <div class="armain">
+  <div @click="dakaiwenz" class="armain">
     <div class="arr0">
       <span>{{title}}</span>
       <div style="flex:1"></div>
@@ -12,7 +12,7 @@
       <span>{{name}}&nbsp;&nbsp;&nbsp;</span>
       <span>{{num}} 评论&nbsp;&nbsp;&nbsp;</span>
       <span>{{showtime}}前&nbsp;&nbsp;&nbsp;</span>
-      <span @click="fankui" class="fr">×</span>
+      <span @click.stop="fankui" class="fr">×</span>
     </div>
   </div>
 </template>
@@ -35,6 +35,14 @@ export default {
     },
   },
   methods: {
+    dakaiwenz(){
+      this.$router.push({
+        name:'article',
+        params:{
+          id:this.id
+        }
+      })
+    },
     fankui(){
       this.$bus.$emit('fankui',this.id)
     },
